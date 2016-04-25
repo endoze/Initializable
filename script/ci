@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+xcodebuild -configuration "Debug" \
+           -destination "name=iPhone 5,OS=9.3" \
+           -scheme "Initializable" \
+           -workspace "Initializable.xcworkspace" \
+           build test | \
+  xcpretty --color \
+           --report html \
+           --output "build/reports/test-report.html" \
+           --screenshots \
+           --report junit \
+           --output "build/reports/test-report.xml"
+
+bundle exec slather coverage -v
