@@ -1,0 +1,16 @@
+language: objective-c
+osx_image: xcode7.3
+branches:
+  only:
+    - master
+
+before_install:
+  - rvm use $RVM_RUBY_VERSION
+
+install:
+  - bundle install --without=documentation --path ../travis_bundle_dir
+  - bundle exec pod install
+
+script: script/ci
+
+after_success: bundle exec slather

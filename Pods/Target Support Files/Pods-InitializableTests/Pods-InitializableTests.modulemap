@@ -1,0 +1,6 @@
+framework module Pods_InitializableTests {
+  umbrella header "Pods-InitializableTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
