@@ -40,6 +40,16 @@ import Foundation
    - returns: The current ReleaseStage
    */
   func currentStage() -> ReleaseStage
+
+  /**
+   This method is the default way to access configuration keys and values based on the current ReleaseStage
+
+   - parameter service: Key representing the service to pull keys from
+   - parameter key:     Key representing the service key to pull values from
+
+   - returns: Returns the stored service key value or nil if it's not present
+   */
+  optional func configurationValueForService(service: String, key: String) -> String?
 }
 
 public extension Configurable {

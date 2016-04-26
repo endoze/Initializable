@@ -43,6 +43,9 @@ Then add the framework as a linked framework.
 Add the following to your Podfile:
 
 ```
+use_frameworks!
+
+
 pod 'Initializable'
 ```
 
@@ -50,7 +53,42 @@ Then run `pod install`
 
 ## Show me the code
 
-If your language of choice is Swift:
+### If your language of choice is Swift
+
+You need to implement a couple objects that conform to the Configurable
+protocol and the Initializable protocol.
+
+```swift
+// Configuration.swift
+
+class Configuration: NSObject, Configurable {
+  static let sharedConfiguration = Configuration()
+
+  var serviceStorage: [String : [Int : [String : String]]] = [:]
+
+  override init() {
+    serviceStorage = [
+      "FakeService" : [
+        ReleaseStage.Development.rawValue : [
+          "ApiKey": "abc123"
+        ]
+      ]
+    ]
+  }
+
+  static func defaultConfiguration() -> Configurable {
+    return sharedConfiguration
+  }
+
+  func currentStage() -> ReleaseStage {
+    return .Development
+  }
+
+  // Notice we don't define `configurationValueForService:key:` in Swift
+  // this is because of the default implementation provided by the
+  // extension to Configurable
+}
+```
 
 ```Swift
 // ThirdpartyInitializer.swift
@@ -68,6 +106,9 @@ class ThirdpartyInitializer: NSObject, Initializable {
   }
 }
 ```
+
+Then jump into your Application Delegate and hook the initializer(s) into
+application lifecycle methods.
 
 ```Swift
 // AppDelegate.swift
@@ -101,13 +142,92 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-Or if you prefer Objective-C:
+### Or if you prefer Objective-C:
+
+You need to implement a couple objects that conform to the Configurable
+protocol and the Initializable protocol.
+
+```objective-c
+// Configuration.h
+
+#import <Foundation/Foundation.h>
+
+@import Initializable;
+
+@interface Configuration : NSObject <Configurable>
+
+@property (nonatomic, copy) NSDictionary<NSString *, NSDictionary<NSNumber *, NSDictionary<NSString *, NSString *> *> *> *serviceStorage;
+
+@end
+```
+
+```objective-c
+// Configuration.m
+
+#import "Configuration.h"
+
+@implementation Configuration
+
++ (Configuration *)defaultConfiguration
+{
+  static id instance = nil;
+  static dispatch_once_t onceToken;
+
+  dispatch_once(&onceToken, ^{
+      instance = [[self alloc] init];
+  });
+
+  return instance;
+}
+
+- (ReleaseStage)currentStage
+{
+  return ReleaseStageDevelopment;
+}
+
+- (NSDictionary *)serviceStorage
+{
+  if (!_serviceStorage) {
+    _serviceStorage = @{
+      @(ReleaseStageDevelopment) : @{
+        @"FakeService": @{
+          @"apiKey": @"abc123"
+        }
+      }
+    };
+  }
+
+  return _serviceStorage;
+}
+
+// Notice we define `configurationValueForService:key:` in Objective-C
+// this is because the default implementation provided by the extension
+// to Configurable is not visible to Objective-C code.
+- (NSString *)configurationValueForService:(NSString *)service key:(NSString *)key
+{
+  Configuration *configuration = [Configuration defaultConfiguration];
+  NSDictionary *serviceStorage = [configuration serviceStorage];
+  NSDictionary *stageStorage = serviceStorage[@([configuration currentStage])];
+  NSDictionary *serviceKeys;
+
+  if (stageStorage) {
+    if ((serviceKeys = stageStorage[service])) {
+      return serviceKeys[key];
+    }
+  }
+
+  return nil;
+}
+
+@end
+```
 
 ```objective-c
 // ThirdpartyInitializer.h
 
 #import <Foundation/Foundation.h>
-#import <Initializable/Initializable.h>
+
+@import Initializable;
 
 @interface ThirdpartyInitializer <Initializable>
 
@@ -121,7 +241,9 @@ Or if you prefer Objective-C:
 
 @implementation ThirdpartyInitializer
 
-- (void)performWithConfiguration:(id<Configurable>)configuration
+// Notice we substitute id<Configurable> here for our custom class that
+// implements the Configurable protocol in the method implementation
+- (void)performWithConfiguration:(Configuration *)configuration
 {
   NSString *apiKey = [configuration configurationValueForService:@"Thirdparty" key:@"apiKey"];
   [Thirdparty initWithApiKey:apiKey];
@@ -135,11 +257,15 @@ Or if you prefer Objective-C:
 @end
 ```
 
+Then jump into your Application Delegate and hook the initializer(s) into
+application lifecycle methods.
+
 ```objective-c
 // AppDelegate.m
 
 #import "AppDelegate.h"
-#import <Initializable/Initializable.h>
+
+@import Initializable;
 
 @interface AppDelegate ()
 
