@@ -78,7 +78,10 @@ separated into objects each with their own responsibility.</p>
 
 <p>Add the following to your Podfile:</p>
 
-<pre><code>pod 'Initializable'
+<pre><code>use_frameworks!
+
+
+pod 'Initializable'
 </code></pre>
 
 <p>Then run <code>pod install</code></p>
@@ -86,7 +89,41 @@ separated into objects each with their own responsibility.</p>
 <h2>
 <a id="show-me-the-code" class="anchor" href="#show-me-the-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Show me the code</h2>
 
-<p>If your language of choice is Swift:</p>
+<h3>
+<a id="if-your-language-of-choice-is-swift" class="anchor" href="#if-your-language-of-choice-is-swift" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>If your language of choice is Swift</h3>
+
+<p>You need to implement a couple objects that conform to the Configurable
+protocol and the Initializable protocol.</p>
+
+<div class="highlight highlight-source-swift"><pre><span class="pl-c">// Configuration.swift</span>
+
+<span class="pl-k">class</span> Configuration: NSObject, Configurable {
+  <span class="pl-k">static</span> <span class="pl-k">let</span> sharedConfiguration <span class="pl-k">=</span> Configuration()
+
+  <span class="pl-k">var</span> serviceStorage: [<span class="pl-c1">String</span> <span class="pl-k">:</span> [<span class="pl-c1">Int</span> <span class="pl-k">:</span> [<span class="pl-c1">String</span> <span class="pl-k">:</span> <span class="pl-c1">String</span>]]] <span class="pl-k">=</span> [<span class="pl-k">:</span>]
+
+  <span class="pl-k">override</span> <span class="pl-k">init</span>() {
+    serviceStorage <span class="pl-k">=</span> [
+      <span class="pl-s"><span class="pl-pds">"</span>FakeService<span class="pl-pds">"</span></span> <span class="pl-k">:</span> [
+        ReleaseStage<span class="pl-k">.</span>Development<span class="pl-k">.</span><span class="pl-c1">rawValue</span> <span class="pl-k">:</span> [
+          <span class="pl-s"><span class="pl-pds">"</span>ApiKey<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>abc123<span class="pl-pds">"</span></span>
+        ]
+      ]
+    ]
+  }
+
+  <span class="pl-k">static</span> <span class="pl-k">func</span> <span class="pl-en">defaultConfiguration</span>() <span class="pl-k">-&gt;</span> Configurable {
+    <span class="pl-k">return</span> sharedConfiguration
+  }
+
+  <span class="pl-k">func</span> <span class="pl-en">currentStage</span>() <span class="pl-k">-&gt;</span> ReleaseStage {
+    <span class="pl-k">return</span> <span class="pl-k">.</span>Development
+  }
+
+  <span class="pl-c">// Notice we don't define `configurationValueForService:key:` in Swift</span>
+  <span class="pl-c">// this is because of the default implementation provided by the</span>
+  <span class="pl-c">// extension to Configurable</span>
+}</pre></div>
 
 <div class="highlight highlight-source-swift"><pre><span class="pl-c">// ThirdpartyInitializer.swift</span>
 
@@ -102,6 +139,9 @@ separated into objects each with their own responsibility.</p>
     <span class="pl-k">return</span> <span class="pl-c1">false</span>
   }
 }</pre></div>
+
+<p>Then jump into your Application Delegate and hook the initializer(s) into
+application lifecycle methods.</p>
 
 <div class="highlight highlight-source-swift"><pre><span class="pl-c">// AppDelegate.swift</span>
 
@@ -133,12 +173,88 @@ separated into objects each with their own responsibility.</p>
   <span class="pl-c">// ...</span>
 }</pre></div>
 
-<p>Or if you prefer Objective-C:</p>
+<h3>
+<a id="or-if-you-prefer-objective-c" class="anchor" href="#or-if-you-prefer-objective-c" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Or if you prefer Objective-C</h3>
+
+<p>You need to implement a couple objects that conform to the Configurable
+protocol and the Initializable protocol.</p>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// Configuration.h</span>
+
+#<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">&lt;</span>Foundation/Foundation.h<span class="pl-pds">&gt;</span></span>
+
+@import Initializable;
+
+<span class="pl-k">@interface</span> <span class="pl-en">Configuration</span> : <span class="pl-e">NSObject</span> &lt;Configurable&gt;
+
+<span class="pl-k">@property</span> (<span class="pl-k">nonatomic</span>, <span class="pl-k">copy</span>) <span class="pl-c1">NSDictionary</span>&lt;NSString *, NSDictionary&lt;NSNumber *, NSDictionary&lt;NSString *, NSString *&gt; *&gt; *&gt; *serviceStorage;
+
+<span class="pl-k">@end</span></pre></div>
+
+<div class="highlight highlight-source-objc"><pre><span class="pl-c">// Configuration.m</span>
+
+#<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>Configuration.h<span class="pl-pds">"</span></span>
+
+<span class="pl-k">@implementation</span> <span class="pl-en">Configuration</span>
+
++ (Configuration *)<span class="pl-en">defaultConfiguration</span>
+{
+  <span class="pl-k">static</span> <span class="pl-k">id</span> instance = <span class="pl-c1">nil</span>;
+  <span class="pl-k">static</span> <span class="pl-c1">dispatch_once_t</span> onceToken;
+
+  <span class="pl-c1">dispatch_once</span>(&amp;onceToken, ^{
+      instance = [[<span class="pl-v">self</span> <span class="pl-c1">alloc</span>] <span class="pl-c1">init</span>];
+  });
+
+  <span class="pl-k">return</span> instance;
+}
+
+- (ReleaseStage)<span class="pl-en">currentStage</span>
+{
+  <span class="pl-k">return</span> ReleaseStageDevelopment;
+}
+
+- (<span class="pl-c1">NSDictionary</span> *)<span class="pl-en">serviceStorage</span>
+{
+  <span class="pl-k">if</span> (!_serviceStorage) {
+    _serviceStorage = @{
+      @(ReleaseStageDevelopment) : @{
+        <span class="pl-s"><span class="pl-pds">@"</span>FakeService<span class="pl-pds">"</span></span>: @{
+          <span class="pl-s"><span class="pl-pds">@"</span>apiKey<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">@"</span>abc123<span class="pl-pds">"</span></span>
+        }
+      }
+    };
+  }
+
+  <span class="pl-k">return</span> _serviceStorage;
+}
+
+<span class="pl-c">// Notice we define `configurationValueForService:key:` in Objective-C</span>
+<span class="pl-c">// this is because the default implementation provided by the extension</span>
+<span class="pl-c">// to Configurable is not visible to Objective-C code.</span>
+- (<span class="pl-c1">NSString</span> *)<span class="pl-en">configurationValueForService</span><span class="pl-en">:</span>(<span class="pl-c1">NSString</span> *)<span class="pl-smi">service</span> <span class="pl-en">key</span><span class="pl-en">:</span>(<span class="pl-c1">NSString</span> *)<span class="pl-smi">key</span>
+{
+  Configuration *configuration = [Configuration <span class="pl-c1">defaultConfiguration</span>];
+  <span class="pl-c1">NSDictionary</span> *serviceStorage = [configuration <span class="pl-c1">serviceStorage</span>];
+  <span class="pl-c1">NSDictionary</span> *stageStorage = serviceStorage[@([configuration <span class="pl-c1">currentStage</span>])];
+  <span class="pl-c1">NSDictionary</span> *serviceKeys;
+
+  <span class="pl-k">if</span> (stageStorage) {
+    <span class="pl-k">if</span> ((serviceKeys = stageStorage[service])) {
+      <span class="pl-k">return</span> serviceKeys[key];
+    }
+  }
+
+  <span class="pl-k">return</span> <span class="pl-c1">nil</span>;
+}
+
+<span class="pl-k">@end</span></pre></div>
 
 <div class="highlight highlight-source-objc"><pre><span class="pl-c">// ThirdpartyInitializer.h</span>
 
 #<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">&lt;</span>Foundation/Foundation.h<span class="pl-pds">&gt;</span></span>
-#<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">&lt;</span>Initializable/Initializable.h<span class="pl-pds">&gt;</span></span>
+
+@import Initializable;
 
 <span class="pl-k">@interface</span> <span class="pl-en">ThirdpartyInitializer</span> &lt;Initializable&gt;
 
@@ -150,7 +266,9 @@ separated into objects each with their own responsibility.</p>
 
 <span class="pl-k">@implementation</span> <span class="pl-en">ThirdpartyInitializer</span>
 
-- (<span class="pl-k">void</span>)<span class="pl-en">performWithConfiguration</span><span class="pl-en">:</span>(<span class="pl-k">id</span>&lt;Configurable&gt;)<span class="pl-smi">configuration</span>
+<span class="pl-c">// Notice we substitute id&lt;Configurable&gt; here for our custom class that</span>
+<span class="pl-c">// implements the Configurable protocol in the method implementation</span>
+- (<span class="pl-k">void</span>)<span class="pl-en">performWithConfiguration</span><span class="pl-en">:</span>(Configuration *)<span class="pl-smi">configuration</span>
 {
   <span class="pl-c1">NSString</span> *apiKey = [configuration <span class="pl-c1">configurationValueForService:</span><span class="pl-s"><span class="pl-pds">@"</span>Thirdparty<span class="pl-pds">"</span></span> <span class="pl-c1">key:</span><span class="pl-s"><span class="pl-pds">@"</span>apiKey<span class="pl-pds">"</span></span>];
   [Thirdparty <span class="pl-c1">initWithApiKey:</span>apiKey];
@@ -163,10 +281,14 @@ separated into objects each with their own responsibility.</p>
 
 <span class="pl-k">@end</span></pre></div>
 
+<p>Then jump into your Application Delegate and hook the initializer(s) into
+application lifecycle methods.</p>
+
 <div class="highlight highlight-source-objc"><pre><span class="pl-c">// AppDelegate.m</span>
 
 #<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">"</span>AppDelegate.h<span class="pl-pds">"</span></span>
-#<span class="pl-k">import</span> <span class="pl-s"><span class="pl-pds">&lt;</span>Initializable/Initializable.h<span class="pl-pds">&gt;</span></span>
+
+@import Initializable;
 
 <span class="pl-k">@interface</span> <span class="pl-en">AppDelegate</span> ()
 
