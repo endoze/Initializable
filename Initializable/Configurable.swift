@@ -9,14 +9,21 @@
 import Foundation
 /**
  Enum to describe the various release stages of an application.
-
- - Development: An app in development
- - Test:        An app in testing
- - Production:  An app in production
  */
 @objc public enum ReleaseStage: Int {
+  /**
+   *  An app in development
+   */
   case Development
+
+  /**
+   *  An app in testing
+   */
   case Test
+
+  /**
+   *  An app in testing
+   */
   case Production
 }
 
@@ -52,6 +59,7 @@ import Foundation
   optional func configurationValueForService(service: String, key: String) -> String?
 }
 
+// MARK: - Protocol Default Method Implementation
 public extension Configurable {
   /**
    This method is the default way to access configuration keys and values based on the current ReleaseStage
