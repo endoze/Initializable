@@ -30,7 +30,7 @@
         <section id="main-content">
           <p>Initializable is a set of protocols that allow you to initialize third party
 frameworks and other settings on app launch. It also allows your frameworks
-to tie into <code>applicationDidEnterForeground</code>.</p>
+to tie into <code>applicationDidEnterForeground:</code>.</p>
 
 <p><a href="https://travis-ci.org/endoze/Initializable"><img src="https://travis-ci.org/endoze/Initializable.svg" alt="Build Status"></a>
 <a href="https://coveralls.io/github/endoze/Initializable?branch=master"><img src="https://coveralls.io/repos/github/endoze/Initializable/badge.svg?branch=master" alt="Coverage Status"></a>
@@ -43,7 +43,7 @@ to tie into <code>applicationDidEnterForeground</code>.</p>
 <a id="motivation" class="anchor" href="#motivation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Motivation</h2>
 
 <p>When building new applications, how many times do you pollute
-<code>application:didFinishLaunchingWithOptions</code> with plenty of code initializing
+<code>application:didFinishLaunchingWithOptions:</code> with plenty of code initializing
 third party frameworks or other app wide settings? This framework is designed
 to help cut down on the noise in your AppDelegate and allow this code to be
 separated into objects each with their own responsibility.</p>
