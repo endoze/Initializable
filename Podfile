@@ -8,6 +8,7 @@ target 'Initializable' do
 end
 
 target 'InitializableTests' do
+  platform :osx, '10.11'
   pod 'Quick'
   pod 'Nimble'
 end

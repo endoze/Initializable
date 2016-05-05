@@ -1,4 +1,4 @@
-#import <UIKit/UIKit.h>
+#import <Cocoa/Cocoa.h>
 
 #import "DSL.h"
 #import "NMBExceptionCapture.h"

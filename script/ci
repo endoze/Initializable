@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 xcodebuild -configuration "Debug" \
-           -destination "name=iPhone 5,OS=9.3" \
            -scheme "Initializable" \
            -workspace "Initializable.xcworkspace" \
            build test | \
