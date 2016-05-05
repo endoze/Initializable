@@ -1,4 +1,4 @@
-#import <UIKit/UIKit.h>
+#import <Cocoa/Cocoa.h>
 
 #import "QuickConfiguration.h"
 #import "QCKDSL.h"
