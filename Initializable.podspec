@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = "Initializable"
-  s.version      = "1.1.0"
+  s.version      = "2.0.0"
   s.summary      = "Application Initializer protocols"
 
   s.description  = <<-DESC
@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.homepage     = "http://endoze.github.io/Initializable"
   s.license      = {type: "MIT", file: "LICENSE"}
 
-  s.author             = {"Chris" => "chris@wideeyelabs.com"}
+  s.author       = {"Chris" => "chris@wideeyelabs.com"}
 
   s.ios.deployment_target = "8.0"
   s.osx.deployment_target = "10.10"
@@ -20,5 +20,5 @@ Pod::Spec.new do |s|
   s.tvos.deployment_target = "9.0"
 
   s.source       = {git: "https://github.com/endoze/Initializable.git", tag: "#{s.version}"}
-  s.source_files  = ["Initializable/Initializable.swift", "Initializable/Configurable.swift"]
+  s.source_files = ["Initializable/Initializable.swift", "Initializable/Configurable.swift"]
 end

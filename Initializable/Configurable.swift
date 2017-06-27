@@ -14,17 +14,17 @@ import Foundation
   /**
    *  An app in development
    */
-  case Development
+  case development
 
   /**
    *  An app in testing
    */
-  case Test
+  case test
 
   /**
    *  An app in testing
    */
-  case Production
+  case production
 }
 
 /**
@@ -56,7 +56,7 @@ import Foundation
 
    - returns: Returns the stored service key value or nil if it's not present
    */
-  optional func configurationValueForService(service: String, key: String) -> String?
+  @objc optional func value(for service: String, key: String) -> String?
 }
 
 // MARK: - Protocol Default Method Implementation
@@ -69,7 +69,7 @@ public extension Configurable {
 
    - returns: Returns the stored service key value or nil if it's not present
    */
-  func configurationValueForService(service: String, key: String) -> String? {
+  func value(for service: String, key: String) -> String? {
     return serviceStorage[service]?[currentStage().rawValue]?[key]
   }
 }
