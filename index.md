@@ -69,7 +69,7 @@ class Configuration: NSObject, Configurable {
   override init() {
     serviceStorage = [
       "FakeService" : [
-        ReleaseStage.Development.rawValue : [
+        ReleaseStage.development.rawValue : [
           "ApiKey": "abc123"
         ]
       ]
@@ -81,10 +81,10 @@ class Configuration: NSObject, Configurable {
   }
 
   func currentStage() -> ReleaseStage {
-    return .Development
+    return .development
   }
 
-  // Notice we don't define `configurationValueForService:key:` in Swift
+  // Notice we don't define `value(for:key:)` in Swift
   // this is because of the default implementation provided by the
   // extension to Configurable
 }
@@ -96,8 +96,8 @@ class Configuration: NSObject, Configurable {
 import Initializable
 
 class ThirdpartyInitializer: NSObject, Initializable {
-  func performWithConfiguration(configuration: Configuration) {
-    let apiKey = configuration.configurationValueForService("ThirdParty", "apiKey")
+  func perform(with configuration: Configuration) {
+    let apiKey = configuration.value(for: "ThirdParty", key: "apiKey")
     let _ = Thirdparty(apiKey: apiKey)
   }
 
@@ -124,7 +124,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
     for initializer in initializers {
-      initializer.performWithConfiguration(configuration: configuration)
+      initializer.perform(with: configuration)
     }
 
     return true
@@ -133,7 +133,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func applicationWillEnterForeground(application: UIApplication) {
     for initializer in initializers {
       if initializer.respondsToSelector(#selector(Initializable.shouldPerformWhenApplicationEntersForeground)) {
-        initializer.performWithConfiguration(configuration)
+        initializer.perform(with: configuration)
       }
     }
   }
@@ -142,7 +142,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-### Or if you prefer Objective-C
+### Or if you prefer Objective-C:
 
 You need to implement a couple objects that conform to the Configurable
 protocol and the Initializable protocol.
@@ -200,10 +200,10 @@ protocol and the Initializable protocol.
   return _serviceStorage;
 }
 
-// Notice we define `configurationValueForService:key:` in Objective-C
+// Notice we define `valueFor:key:` in Objective-C
 // this is because the default implementation provided by the extension
 // to Configurable is not visible to Objective-C code.
-- (NSString *)configurationValueForService:(NSString *)service key:(NSString *)key
+- (NSString *)valueFor:(NSString *)service key:(NSString *)key
 {
   Configuration *configuration = [Configuration defaultConfiguration];
   NSDictionary *serviceStorage = [configuration serviceStorage];
@@ -243,9 +243,9 @@ protocol and the Initializable protocol.
 
 // Notice we substitute id<Configurable> here for our custom class that
 // implements the Configurable protocol in the method implementation
-- (void)performWithConfiguration:(Configuration *)configuration
+- (void)performWith:(Configuration *)configuration
 {
-  NSString *apiKey = [configuration configurationValueForService:@"Thirdparty" key:@"apiKey"];
+  NSString *apiKey = [configuration valueFor:@"Thirdparty" key:@"apiKey"];
   [Thirdparty initWithApiKey:apiKey];
 }
 
@@ -277,14 +277,14 @@ application lifecycle methods.
 
 - (void)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [self.initializers makeObjectsPerformSelector:@selector(performWithConfiguration:) withObject:[Configuration defaultConfiguration]];
+  [self.initializers makeObjectsPerformSelector:@selector(performWith:) withObject:[Configuration defaultConfiguration]];
 
   return YES
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-  [self.initializers enumerateObjectsUsingBlock:^void(id<Initializer> initializer, NSUInteger index, BOOL *stop) {
+  [self.initializers enumerateObjectsUsingBlock:^void(id<Initializable> initializer, NSUInteger index, BOOL *stop) {
     if ([initializer respondsToSelector:@selector(shouldPerformWhenApplicationEntersForeground)] &&
         [initializer shouldPerformWhenApplicationEntersForeground]) {
       [initializer performWithConfiguration:[Configuration defaultConfiguration]];
@@ -292,7 +292,7 @@ application lifecycle methods.
   }];
 }
 
-- (NSArray<id <Initializer>> *)initializers
+- (NSArray<id <Initializable>> *)initializers
 {
   if (!_initializers) {
     _initializers = @[
