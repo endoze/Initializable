@@ -90,7 +90,7 @@ class Configuration: NSObject, Configurable {
 }
 ```
 
-```Swift
+```swift
 // ThirdpartyInitializer.swift
 
 import Initializable
@@ -110,7 +110,7 @@ class ThirdpartyInitializer: NSObject, Initializable {
 Then jump into your Application Delegate and hook the initializer(s) into
 application lifecycle methods.
 
-```Swift
+```swift
 // AppDelegate.swift
 
 import UIKit
