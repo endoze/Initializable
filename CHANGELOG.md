@@ -1,10 +1,25 @@
 # Change Log
 
+## 2.x Releases
+- `2.0.x` Releases - [2.0.0](#200)
+
 ## 1.x Releases
 - `1.1.x` Releases - [1.1.0](#110)
 - `1.0.x` Releases - [1.0.1](#101) | [1.0.0](#100)
 
 ---
+## [2.0.0](https://github.com/endoze/Initializable/releases/tag/2.0.0)
+Released on 2017-06-27
+
+### Added
+
+### Updated
+- Swift 3.0 compatibility
+- Renamed methods to be more swift-like (breaking change from 1.x releases)
+
+### Removed
+
+
 ## [1.1.0](https://github.com/endoze/Initializable/releases/tag/1.1.0)
 Released on 2016-05-06
 
