@@ -147,7 +147,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 You need to implement a couple objects that conform to the Configurable
 protocol and the Initializable protocol.
 
-```objective-c
+```objc
 // Configuration.h
 
 #import <Foundation/Foundation.h>
@@ -161,7 +161,7 @@ protocol and the Initializable protocol.
 @end
 ```
 
-```objective-c
+```objc
 // Configuration.m
 
 #import "Configuration.h"
@@ -222,7 +222,7 @@ protocol and the Initializable protocol.
 @end
 ```
 
-```objective-c
+```objc
 // ThirdpartyInitializer.h
 
 #import <Foundation/Foundation.h>
@@ -234,7 +234,7 @@ protocol and the Initializable protocol.
 @end
 ```
 
-```objective-c
+```objc
 // ThirdpartyInitializer.m
 
 #import "ThirdpartyInitializer.h"
@@ -260,7 +260,7 @@ protocol and the Initializable protocol.
 Then jump into your Application Delegate and hook the initializer(s) into
 application lifecycle methods.
 
-```objective-c
+```objc
 // AppDelegate.m
 
 #import "AppDelegate.h"
