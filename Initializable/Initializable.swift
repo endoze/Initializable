@@ -17,12 +17,12 @@ import Foundation
 
    - parameter configuration: An object that conforms to the Configurable protocol.
    */
-  func performWithConfiguration(configuration: Configurable)
+  func perform(with configuration:  Configurable)
 
   /**
    This method is called when the application is entering the foreground. Depending on the return value, `performWithConfiguration` is called.
 
    - returns: Boolean value indicating whether `Initializable.performWithConfiguration`_ should be called when the application enters the foreground.
    */
-  optional func shouldPerformWhenApplicationEntersForeground() -> Bool
+  @objc optional func shouldPerformWhenApplicationEntersForeground() -> Bool
 }

@@ -11,44 +11,36 @@ import Nimble
 
 import Initializable
 
-class ForegroundInitializer: NSObject, Initializable {
-  func performWithConfiguration(configuration: Configurable) {
-
-  }
-
-  func shouldPerformWhenApplicationEntersForeground() -> Bool {
-    return true
-  }
-}
-
-class ApplicationLaunchOnlyInitializer: NSObject, Initializable {
-  func performWithConfiguration(configuration: Configurable) {
-
-  }
-}
-
 class InitializableSpec: QuickSpec {
   override func spec() {
     describe("ForegroundInitializer") {
-      it("responds to performWithConfiguration") {
-        let selector = #selector(Initializable.performWithConfiguration)
+      it("responds to perform(with:)") {
+        let selector = #selector(Initializable.perform(with:))
+        let initializer = ForegroundInitializer()
 
-        expect(ForegroundInitializer().respondsToSelector(selector)).to(beTrue())
+        initializer.perform(with: Configuration())
+        
+        expect(initializer.responds(to: selector)).to(beTrue())
       }
 
       context("if it implements the optional shouldPerformWhenApplicationEntersForeground") {
         it("responds to shouldPerformWhenApplicationEntersForeground") {
           let selector = #selector(Initializable.shouldPerformWhenApplicationEntersForeground)
-
-          expect(ForegroundInitializer().respondsToSelector(selector)).to(beTrue())
+          let initializer = ForegroundInitializer()
+          
+          expect(ForegroundInitializer().responds(to: selector)).to(beTrue())
+          expect(initializer.shouldPerformWhenApplicationEntersForeground()).to(beTrue())
         }
       }
 
       context("if it doesn't implement the optional shouldPerformWhenAppilcationEntersForeground") {
         it("doesn't respond to shouldPerformWhenApplicationEntersForeground") {
           let selector = #selector(Initializable.shouldPerformWhenApplicationEntersForeground)
+          let initializer = ApplicationLaunchOnlyInitializer()
 
-          expect(ApplicationLaunchOnlyInitializer().respondsToSelector(selector)).to(beFalse())
+          initializer.perform(with: Configuration())
+          
+          expect(ApplicationLaunchOnlyInitializer().responds(to: selector)).to(beFalse())
         }
       }
     }
